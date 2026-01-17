@@ -333,9 +333,14 @@
 - (void) windowWillClose: (NSNotification*) notification
 {
 	[[self document] removeObserver: self forKeyPath: DocKeySelectedItem];
-	
+
     [[NSNotificationCenter defaultCenter] removeObserver: self];
 	[[NSUserDefaultsController sharedUserDefaultsController] removeObserver: self forKeyPath: [@"values." stringByAppendingString: ShareKindColors]];
+
+	// Prevent use-after-free crashes during window close:
+	// Remove the view from the hierarchy entirely to prevent any drawing
+	// while the document data is being deallocated
+	[_treeMapView removeFromSuperview];
 }
 
 @end
