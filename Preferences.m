@@ -23,8 +23,6 @@ NSString *UseSmallFontInSelectionList	= @"UseSmallFontInSelectionList";
 NSString *SplitWindowHorizontally		= @"SplitWindowHorizontally";
 NSString *AnimatedZooming				= @"AnimatedZooming";
 NSString *EnableLogging					= @"EnableLogging";
-NSString *DontShowDonationMessage        = @"DontShowDonationMessage";
-NSString *DontShowPrivacyWarningMessage        = @"DontShowPrivacyWarningMessage";
 NSString *ShareKindColors				= @"ShareKindColors";
 
 

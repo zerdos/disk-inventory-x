@@ -138,10 +138,8 @@ NSString *CollectFileKindStatisticsCanceledException = @"CollectFileKindStatisti
 - (void) removeItemFromFileKindStatistic: (FSItem*) item includingChilds: (BOOL) includingChilds;
 - (void) recalculateFileKindStatisticSizes;
 - (void) removePackagesFromFileKindStatistic: (FSItem*) item;
-- (void) addPackagesToFileKindStatistic: (FSItem*) item; 	
+- (void) addPackagesToFileKindStatistic: (FSItem*) item;
 - (void) removeEmptyKindStatistics;
-
-- (void)checkForProtectedFolders:(NSString * _Nonnull)folder;
 
 - (void) reserveColorsForLargestKinds;
 
@@ -235,8 +233,6 @@ NSString *OldItem = @"OldItem";
 
 - (BOOL) readFromFile: (NSString *) folder ofType: (NSString *) docType
 {
-    [self checkForProtectedFolders:folder];
-    
     //now the real work: loading the folder contents
     @try
     {
@@ -1125,41 +1121,6 @@ NSString *OldItem = @"OldItem";
     }
 	
 	[kinds release]; //mutableCopy returns a retained object (not autoreleased)
-}
-
-- (void)checkForProtectedFolders:(NSString * _Nonnull)folder
-{
-    NSFileManager *fileMgr = [NSFileManager defaultManager];
-    NSArray<NSURL*> *protectedFolders = [fileMgr privacyProtectedFoldersInURL:[NSURL fileURLWithPath:folder]];
-    if ( [protectedFolders count] > 0 )
-    {
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        if ( ![defaults boolForVersionDependantKey: DontShowPrivacyWarningMessage] )
-        {
-            NSAlert *alert = [[[NSAlert alloc] init] autorelease];
-            
-            alert.alertStyle = NSAlertStyleInformational;
-            
-            alert.messageText = NSLocalizedString(@"Some folders which will be scanned contain private files. The access is protected by the macOS privacy protection.\n\nUpon first access macOS will ask whether you allow Disk Inventory X access to these folders and files.\n\nDisk Inventory X does not read any data - just information like file sizes and types are collected.", @"");
-            alert.informativeText = NSLocalizedString(@"You can change the access settings in the System Preferences (Security/Privacy).", @"");
-            
-            alert.showsSuppressionButton = YES;
-            alert.suppressionButton.title = NSLocalizedString(@"Do not show this information again.", @"");
-            
-            [alert runModal];
-            
-            if (alert.suppressionButton.state == NSOnState)
-            {
-                // Suppress this alert for the current version
-                [defaults setBool: YES forVersionDependantKey: DontShowPrivacyWarningMessage];
-            }
-            
-            // let the alert disappear before the consent dialogs pop up
-            [[NSRunLoop currentRunLoop] runUntilDate: [NSDate date]];
-        }
-        
-        [fileMgr triggerConsentDialogForPrivacyProtectedFolders:protectedFolders];
-    }
 }
 
 //@@test
