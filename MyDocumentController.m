@@ -159,13 +159,6 @@ BOOL g_EnableLogging;
 	[[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString: @"http://www.derlien.com"]];
 }
 
-- (IBAction) closeDonationPanel: (id) sender;
-{
-	[_donationPanel close]; //will release itself
-	_donationPanel = nil;
-}
-
-
 #pragma mark --------app notifications-----------------
 
 - (void) applicationWillFinishLaunching: (NSNotification*) notification
@@ -187,17 +180,6 @@ BOOL g_EnableLogging;
 {
     //@@test
     //[[OAController sharedController] applicationDidFinishLaunching:notification];
-
-    //show donate message
-	if ( ![[NSUserDefaults standardUserDefaults] boolForKey: DontShowDonationMessage] )
-	{
-		[NSBundle loadNibNamed: @"DonationPanel" owner:self];
-		[_donationPanel setWorksWhenModal: YES];
-	}
-	
-//	DIXFinderCMInstaller *installer = [DIXFinderCMInstaller installer];
-//	if ( ![installer isInstalled] )
-//		[installer installToDomain: kUserDomain];
 }
 
 #pragma mark -----------------NSMenu delegates-----------------------
