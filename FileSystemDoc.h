@@ -20,6 +20,7 @@
 #import "Preferences.h"
 #import "LoadingPanelController.h"
 #import "FileTypeColors.h"
+#import "FSItemScanner.h"
 
 //holds information about the count and size of the files of one kind (e.g. MP3 files)
 @interface FileKindStatistic : NSObject
@@ -48,7 +49,7 @@
 
 @end
 
-@interface FileSystemDoc : NSDocument
+@interface FileSystemDoc : NSDocument <FSItemScannerDelegate>
 {
     FSItem *_rootItem;
     FSItem *_selectedItem;
@@ -56,10 +57,14 @@
     NSMutableDictionary *_fileKindStatistics;	//dictionary: kind name -> FileKindStatistic
 	NSMutableDictionary *_viewOptions;
 	FileTypeColors *_kindColors;
-	
+
 	//these variables are used during the initial directory scan
 	LoadingPanelController *_progressController;
 	NSMutableArray *_directoryStack;
+
+	//async scanner for background loading
+	FSItemScanner *_scanner;
+	NSMutableDictionary *_statisticsCache; //cache statistics per zoomed item
 }
 
 - (BOOL) showPhysicalFileSize;

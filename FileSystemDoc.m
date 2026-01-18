@@ -191,21 +191,30 @@ NSString *OldItem = @"OldItem";
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];        
-	
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+
 	NSUserDefaultsController *sharedDefsController = [NSUserDefaultsController sharedUserDefaultsController];
 	[sharedDefsController removeObserver: self forKeyPath: [@"values." stringByAppendingString: ShareKindColors]];
-	
+
 	[_viewOptions release];
     [_fileKindStatistics release];
     [_zoomStack release];
-	
+
     [_rootItem release];
-	
+
 	[_directoryStack release];
 
 	[_kindColors release];
-	
+
+	// Cancel and release scanner if still active
+	if (_scanner)
+	{
+		[_scanner cancel];
+		[_scanner release];
+	}
+
+	[_statisticsCache release];
+
     [super dealloc];
 }
 
@@ -521,7 +530,10 @@ NSString *OldItem = @"OldItem";
     
 	//"checkTrash" may have editied the kind statistic, so notify observers but now
 	[self didChangeValueForKey: @"kindStatistics"];
-	
+
+	// Invalidate statistics cache since tree changed
+	[_statisticsCache removeAllObjects];
+
 	//notify observers of the change
 	[[NSNotificationCenter defaultCenter] postNotificationName: FSItemsChangedNotification object: self];
 	
@@ -662,7 +674,10 @@ NSString *OldItem = @"OldItem";
 	{
 		if ( [_zoomStack lastObject] == item )
 			[_zoomStack replaceObjectAtIndex: ([_zoomStack count]-1) withObject: refreshedItem];
-		
+
+		// Invalidate statistics cache since tree changed
+		[_statisticsCache removeAllObjects];
+
 		//notify observers of the change
 		[[NSNotificationCenter defaultCenter] postNotificationName: FSItemsChangedNotification object: self];
 	}
@@ -844,13 +859,38 @@ NSString *OldItem = @"OldItem";
 - (void) refreshFileKindStatistics
 {
 	[self willChangeValueForKey: @"kindStatistics"];
-	
-	//collect sizes and file count of all file kinds 
-	[self addItemToFileKindStatistic: nil includingChilds: YES];
-	
-	//reserve the predefined colors for the kinds with the biggest size sums of the appropriate files
+
+	// Initialize cache if needed
+	if (_statisticsCache == nil)
+		_statisticsCache = [[NSMutableDictionary alloc] init];
+
+	// Check cache for current zoomed item
+	FSItem *zoomedItem = [self zoomedItem];
+	NSValue *cacheKey = [NSValue valueWithNonretainedObject:zoomedItem];
+	NSDictionary *cachedStats = [_statisticsCache objectForKey:cacheKey];
+
+	if (cachedStats != nil)
+	{
+		// Use cached statistics
+		[_fileKindStatistics release];
+		_fileKindStatistics = [cachedStats mutableCopy];
+
+		LOG(@"Using cached statistics for zoomed item");
+	}
+	else
+	{
+		// Collect sizes and file count of all file kinds
+		[self addItemToFileKindStatistic: nil includingChilds: YES];
+
+		// Cache the statistics for this zoomed item
+		[_statisticsCache setObject:[[_fileKindStatistics copy] autorelease] forKey:cacheKey];
+
+		LOG(@"Computed and cached statistics for zoomed item");
+	}
+
+	// Reserve the predefined colors for the kinds with the biggest size sums
 	[self reserveColorsForLargestKinds];
-	
+
 	[self didChangeValueForKey: @"kindStatistics"];
 }
 
@@ -909,6 +949,95 @@ NSString *OldItem = @"OldItem";
 - (BOOL) fsItemShouldUsePhysicalFileSize: (FSItem*) item
 {
 	return [self showPhysicalFileSize];
+}
+
+#pragma mark --------FSItemScannerDelegate-----------------
+
+- (void) scanner:(FSItemScanner *)scanner didFinishWithRootItem:(FSItem *)rootItem
+{
+	LOG(@"Scanner finished with root item: %@", [rootItem path]);
+
+	// Transfer ownership of root item
+	[_rootItem release];
+	_rootItem = [rootItem retain];
+
+	// Set ourselves as delegate for any future operations
+	[_rootItem setDelegate:self];
+
+	// Close progress panel
+	[_progressController release];
+	_progressController = nil;
+
+	// Collect file kind statistics
+	[self refreshFileKindStatistics];
+
+	// Release scanner
+	[_scanner release];
+	_scanner = nil;
+
+	// Make window controllers and show the document
+	[self makeWindowControllers];
+	[self showWindows];
+
+	LOG(@"************** Loading complete (async) *******************");
+	LOG(@"%u items created", g_fileCount + g_folderCount);
+	LOG(@"%u files", g_fileCount);
+	LOG(@"%u folders", g_folderCount);
+}
+
+- (void) scanner:(FSItemScanner *)scanner didFailWithError:(NSError *)error
+{
+	LOG(@"Scanner failed with error: %@", [error localizedDescription]);
+
+	// Close progress panel
+	[_progressController release];
+	_progressController = nil;
+
+	// Release scanner
+	[_scanner release];
+	_scanner = nil;
+
+	// Show error to user
+	NSRunInformationalAlertPanel(
+		NSLocalizedString(@"The folder's content could not be loaded.", @""),
+		@"%@", nil, nil, nil, [error localizedDescription]);
+}
+
+- (void) scanner:(FSItemScanner *)scanner didEnterFolder:(NSString *)path
+{
+	// Update progress panel with current path
+	if (_progressController != nil)
+	{
+		[_progressController setMessageText:path];
+	}
+}
+
+- (void) scannerDidCancel:(FSItemScanner *)scanner
+{
+	LOG(@"Scanner was cancelled");
+
+	// Close progress panel
+	[_progressController release];
+	_progressController = nil;
+
+	// Release scanner
+	[_scanner release];
+	_scanner = nil;
+}
+
+- (BOOL) scannerShouldUsePhysicalFileSize:(FSItemScanner *)scanner
+{
+	return [self showPhysicalFileSize];
+}
+
+- (BOOL) scannerShouldLookIntoPackages:(FSItemScanner *)scanner
+{
+	return [self showPackageContents];
+}
+
+- (BOOL) scannerShouldIgnoreCreatorCode:(FSItemScanner *)scanner
+{
+	return [self ignoreCreatorCode];
 }
 
 #pragma mark --------KVO-----------------

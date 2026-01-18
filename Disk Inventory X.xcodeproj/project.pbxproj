@@ -92,6 +92,10 @@
 		FCCFB382097FA4C1009EA2B6 /* VolumesPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = FCCFB36E097FA4C1009EA2B6 /* VolumesPanel.nib */; };
 		FCD5DAFE09CDD4260051C1CF /* MainWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = FCD5DAFC09CDD4260051C1CF /* MainWindow.m */; };
 		FCFB17B621B876A400E3F8C4 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FCFB17B521B876A400E3F8C4 /* Images.xcassets */; };
+		FCA0AA0127E0000100000003 /* FolderDropView.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0AA0127E0000100000002 /* FolderDropView.m */; };
+		FCA0AA0127E0000100000006 /* StartupPanelController.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0AA0127E0000100000005 /* StartupPanelController.m */; };
+		FCA0AA0127E0000100000009 /* FSItemScanner.m in Sources */ = {isa = PBXBuildFile; fileRef = FCA0AA0127E0000100000008 /* FSItemScanner.m */; };
+		FCA0AA0127E000010000000B /* StartupPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = FCA0AA0127E000010000000A /* StartupPanel.nib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -237,6 +241,16 @@
 		FCCFB2E4097FA42B009EA2B6 /* VolumeNameTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VolumeNameTransformer.m; sourceTree = "<group>"; };
 		FCCFB2E5097FA42B009EA2B6 /* VolumeUsageTransformer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = VolumeUsageTransformer.h; sourceTree = "<group>"; };
 		FCCFB2E6097FA42B009EA2B6 /* VolumeUsageTransformer.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = VolumeUsageTransformer.m; sourceTree = "<group>"; };
+		FCA0AA0127E0000100000001 /* FolderDropView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FolderDropView.h; sourceTree = "<group>"; };
+		FCA0AA0127E0000100000002 /* FolderDropView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FolderDropView.m; sourceTree = "<group>"; };
+		FCA0AA0127E0000100000004 /* StartupPanelController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StartupPanelController.h; sourceTree = "<group>"; };
+		FCA0AA0127E0000100000005 /* StartupPanelController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StartupPanelController.m; sourceTree = "<group>"; };
+		FCA0AA0127E0000100000007 /* FSItemScanner.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSItemScanner.h; sourceTree = "<group>"; };
+		FCA0AA0127E0000100000008 /* FSItemScanner.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSItemScanner.m; sourceTree = "<group>"; };
+		FCA0AA0127E000010000000C /* en */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = en; path = en.lproj/StartupPanel.nib; sourceTree = "<group>"; };
+		FCA0AA0127E000010000000D /* de */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = de; path = de.lproj/StartupPanel.nib; sourceTree = "<group>"; };
+		FCA0AA0127E000010000000E /* fr */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = fr; path = fr.lproj/StartupPanel.nib; sourceTree = "<group>"; };
+		FCA0AA0127E000010000000F /* es */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = es; path = es.lproj/StartupPanel.nib; sourceTree = "<group>"; };
 		FCCFB2E8097FA42B009EA2B6 /* TreeMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = TreeMapViewController.m; sourceTree = "<group>"; };
 		FCCFB2E9097FA42B009EA2B6 /* TreeMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = TreeMapViewController.h; sourceTree = "<group>"; };
 		FCCFB2EB097FA42B009EA2B6 /* FileKindsTableController.m */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.objc; path = FileKindsTableController.m; sourceTree = "<group>"; };
@@ -378,6 +392,7 @@
 				FCCFB366097FA4C1009EA2B6 /* MainMenu.nib */,
 				FCCFB36A097FA4C1009EA2B6 /* TreeMap.nib */,
 				FCCFB36E097FA4C1009EA2B6 /* VolumesPanel.nib */,
+				FCA0AA0127E000010000000A /* StartupPanel.nib */,
 				FCCFB364097FA4C1009EA2B6 /* Localizable.strings */,
 				FCCFB34D097FA4C1009EA2B6 /* Credits.rtf */,
 				FCCFB360097FA4C1009EA2B6 /* InfoPlist.strings */,
@@ -524,6 +539,10 @@
 			children = (
 				FCCFB2E1097FA42B009EA2B6 /* DrivesPanelController.h */,
 				FCCFB2E2097FA42B009EA2B6 /* DrivesPanelController.m */,
+				FCA0AA0127E0000100000004 /* StartupPanelController.h */,
+				FCA0AA0127E0000100000005 /* StartupPanelController.m */,
+				FCA0AA0127E0000100000001 /* FolderDropView.h */,
+				FCA0AA0127E0000100000002 /* FolderDropView.m */,
 				FCCFB2E3097FA42B009EA2B6 /* VolumeNameTransformer.h */,
 				FCCFB2E4097FA42B009EA2B6 /* VolumeNameTransformer.m */,
 				FCCFB2E5097FA42B009EA2B6 /* VolumeUsageTransformer.h */,
@@ -578,6 +597,8 @@
 				FCCFB2FC097FA42B009EA2B6 /* MainWindowController.h */,
 				FCCFB2FD097FA42B009EA2B6 /* FSItem.h */,
 				FCCFB2FE097FA42B009EA2B6 /* FSItem.m */,
+				FCA0AA0127E0000100000007 /* FSItemScanner.h */,
+				FCA0AA0127E0000100000008 /* FSItemScanner.m */,
 				FCCFB2FF097FA42B009EA2B6 /* FileTypeColors.m */,
 				FCCFB300097FA42B009EA2B6 /* FileTypeColors.h */,
 				FCCFB301097FA42B009EA2B6 /* FileSystemDoc.m */,
@@ -737,6 +758,7 @@
 				FCCFB381097FA4C1009EA2B6 /* TreeMapPreferencesPage.nib in Resources */,
 				FC2C2CA2238C802600D04E20 /* memory usage using NSURL.txt in Resources */,
 				FCCFB382097FA4C1009EA2B6 /* VolumesPanel.nib in Resources */,
+				FCA0AA0127E000010000000B /* StartupPanel.nib in Resources */,
 				FC4C4AC109802035004CCA22 /* Help in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -806,6 +828,9 @@
 				FC7F77D71067C9500090E839 /* NTTitledInfoPair.m in Sources */,
 				FC7F77D81067C9500090E839 /* NTTitledInfoView.m in Sources */,
 				FC33B45A230C846F00133632 /* NSURL-Extensions.m in Sources */,
+				FCA0AA0127E0000100000003 /* FolderDropView.m in Sources */,
+				FCA0AA0127E0000100000006 /* StartupPanelController.m in Sources */,
+				FCA0AA0127E0000100000009 /* FSItemScanner.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -953,6 +978,17 @@
 				FC2B2B83277E43D10040ED6C /* en */,
 			);
 			name = VolumesPanel.nib;
+			sourceTree = "<group>";
+		};
+		FCA0AA0127E000010000000A /* StartupPanel.nib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				FCA0AA0127E000010000000D /* de */,
+				FCA0AA0127E000010000000F /* es */,
+				FCA0AA0127E000010000000E /* fr */,
+				FCA0AA0127E000010000000C /* en */,
+			);
+			name = StartupPanel.nib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

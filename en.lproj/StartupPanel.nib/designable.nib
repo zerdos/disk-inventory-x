@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="StartupPanelController">
+            <connections>
+                <outlet property="_startupPanel" destination="5" id="panel-outlet"/>
+                <outlet property="_folderDropView" destination="dropview-1" id="dropview-outlet"/>
+                <outlet property="_volumesTableView" destination="7" id="tableview-outlet"/>
+                <outlet property="_openVolumeButton" destination="196" id="openbutton-outlet"/>
+                <outlet property="_volumesController" destination="39" id="controller-outlet"/>
+                <outlet property="_homeButton" destination="home-btn" id="home-outlet"/>
+                <outlet property="_downloadsButton" destination="downloads-btn" id="downloads-outlet"/>
+                <outlet property="_desktopButton" destination="desktop-btn" id="desktop-outlet"/>
+                <outlet property="_documentsButton" destination="documents-btn" id="documents-outlet"/>
+                <outlet property="_applicationsButton" destination="applications-btn" id="applications-outlet"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Disk Inventory X" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" frameAutosaveName="StartupPanel" animationBehavior="default" id="5" userLabel="Window">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="97" y="300" width="600" height="480"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="1002"/>
+            <value key="minSize" type="size" width="550" height="400"/>
+            <view key="contentView" id="6">
+                <rect key="frame" x="0.0" y="0.0" width="600" height="480"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <!-- Folder Drop Zone -->
+                    <customView id="dropview-1" customClass="FolderDropView">
+                        <rect key="frame" x="20" y="350" width="560" height="110"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                        <connections>
+                            <outlet property="delegate" destination="-2" id="dropview-delegate"/>
+                        </connections>
+                    </customView>
+
+                    <!-- Quick Access Label -->
+                    <textField verticalHuggingPriority="750" id="quick-access-label">
+                        <rect key="frame" x="20" y="318" width="100" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Quick Access:">
+                            <font key="font" metaFont="systemBold" size="13"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+
+                    <!-- Shortcut Buttons -->
+                    <button verticalHuggingPriority="750" id="home-btn">
+                        <rect key="frame" x="20" y="280" width="100" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Home" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="home-cell">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="openHomeFolder:" target="-2" id="home-action"/>
+                        </connections>
+                    </button>
+
+                    <button verticalHuggingPriority="750" id="downloads-btn">
+                        <rect key="frame" x="126" y="280" width="100" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Downloads" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="downloads-cell">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="openDownloadsFolder:" target="-2" id="downloads-action"/>
+                        </connections>
+                    </button>
+
+                    <button verticalHuggingPriority="750" id="desktop-btn">
+                        <rect key="frame" x="232" y="280" width="100" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Desktop" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="desktop-cell">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="openDesktopFolder:" target="-2" id="desktop-action"/>
+                        </connections>
+                    </button>
+
+                    <button verticalHuggingPriority="750" id="documents-btn">
+                        <rect key="frame" x="338" y="280" width="100" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Documents" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="documents-cell">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="openDocumentsFolder:" target="-2" id="documents-action"/>
+                        </connections>
+                    </button>
+
+                    <button verticalHuggingPriority="750" id="applications-btn">
+                        <rect key="frame" x="444" y="280" width="110" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Applications" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="applications-cell">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="openApplicationsFolder:" target="-2" id="applications-action"/>
+                        </connections>
+                    </button>
+
+                    <!-- Volumes Label -->
+                    <textField verticalHuggingPriority="750" id="volumes-label">
+                        <rect key="frame" x="20" y="242" width="100" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Volumes:">
+                            <font key="font" metaFont="systemBold" size="13"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+
+                    <!-- Volumes Table -->
+                    <scrollView autohidesScrollers="YES" horizontalLineScroll="47" horizontalPageScroll="10" verticalLineScroll="47" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" id="9">
+                        <rect key="frame" x="20" y="76" width="560" height="160"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <clipView key="contentView" id="hQu-Nw-Fht">
+                            <rect key="frame" x="1" y="1" width="558" height="158"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="45" id="7">
+                                    <rect key="frame" x="0.0" y="0.0" width="558" height="158"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <size key="intercellSpacing" width="3" height="2"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
+                                    <tableColumns>
+                                        <tableColumn editable="NO" width="50" minWidth="40" maxWidth="1000" id="8">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Icon">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                            </tableHeaderCell>
+                                            <imageCell key="dataCell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" id="146"/>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="39" name="value" keyPath="arrangedObjects.image" id="149">
+                                                    <dictionary key="options">
+                                                        <integer key="NSRaisesForNotApplicableKeys" value="0"/>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </tableColumn>
+                                        <tableColumn editable="NO" width="180" minWidth="40" maxWidth="1000" id="10">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Volume">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="288">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="39" name="value" keyPath="arrangedObjects.volume" id="171">
+                                                    <dictionary key="options">
+                                                        <integer key="NSRaisesForNotApplicableKeys" value="0"/>
+                                                        <string key="NSValueTransformerName">volumeNameTransformer</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </tableColumn>
+                                        <tableColumn identifier="usage" width="126" minWidth="10" maxWidth="1000" id="178">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Usage">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" alignment="right" title="Text Cell" id="283">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                            <connections>
+                                                <binding destination="39" name="value" keyPath="arrangedObjects.volume" id="189">
+                                                    <dictionary key="options">
+                                                        <integer key="NSAllowsEditingMultipleValuesSelection" value="0"/>
+                                                        <integer key="NSConditionallySetsEditable" value="0"/>
+                                                        <integer key="NSRaisesForNotApplicableKeys" value="0"/>
+                                                        <string key="NSValueTransformerName">volumeUsageTransformer</string>
+                                                    </dictionary>
+                                                </binding>
+                                            </connections>
+                                        </tableColumn>
+                                        <tableColumn identifier="usagePercent" editable="NO" width="155" minWidth="4" maxWidth="1000" id="11">
+                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="">
+                                                <font key="font" metaFont="smallSystem"/>
+                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                            </tableHeaderCell>
+                                            <textFieldCell key="dataCell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" alignment="left" title="Text Cell" id="289">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
+                                        </tableColumn>
+                                    </tableColumns>
+                                    <connections>
+                                        <outlet property="delegate" destination="-2" id="262"/>
+                                    </connections>
+                                </tableView>
+                            </subviews>
+                        </clipView>
+                        <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="290">
+                            <rect key="frame" x="-100" y="-100" width="881" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="NO" id="291">
+                            <rect key="frame" x="-30" y="1" width="15" height="158"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+
+                    <!-- Bottom Buttons -->
+                    <button verticalHuggingPriority="750" id="browse-btn">
+                        <rect key="frame" x="20" y="20" width="100" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="push" title="Browse..." bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="browse-cell">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="browseForFolder:" target="-2" id="browse-action"/>
+                        </connections>
+                    </button>
+
+                    <button verticalHuggingPriority="750" imageHugsTitle="YES" id="196">
+                        <rect key="frame" x="428" y="20" width="152" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <buttonCell key="cell" type="push" title="Open Volume" bezelStyle="rounded" alignment="center" borderStyle="border" inset="2" id="285">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="openVolume:" target="-2" id="281"/>
+                            <binding destination="39" name="enabled" keyPath="selectedObjects.@count" id="280"/>
+                        </connections>
+                    </button>
+                </subviews>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="261"/>
+                <outlet property="initialFirstResponder" destination="7" id="254"/>
+            </connections>
+        </window>
+        <arrayController objectClassName="NTVolume" editable="NO" automaticallyPreparesContent="YES" avoidsEmptySelection="NO" clearsFilterPredicateOnInsertion="NO" id="39" userLabel="VolumesArrayController">
+            <declaredKeys>
+                <string>image</string>
+                <string>volume</string>
+                <string>@count</string>
+            </declaredKeys>
+            <connections>
+                <binding destination="-2" name="contentArray" keyPath="volumes" id="282"/>
+            </connections>
+        </arrayController>
+    </objects>
+</document>

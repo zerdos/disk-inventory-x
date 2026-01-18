@@ -15,7 +15,7 @@
 //
 
 #import "MyDocumentController.h"
-#import "DrivesPanelController.h"
+#import "StartupPanelController.h"
 #import "Preferences.h"
 #import "PrefsPanelController.h"
 #import "FileSystemDoc.h"
@@ -171,9 +171,9 @@ BOOL g_EnableLogging;
 	
 	g_EnableLogging = [[NSUserDefaults standardUserDefaults] boolForKey: EnableLogging];
     
-	//show the drives panel before "applicationDidFinishLaunching" so the panel is visible before the first document is loaded
+	//show the startup panel before "applicationDidFinishLaunching" so the panel is visible before the first document is loaded
 	//(e.g. through drag&drop)
-	[[DrivesPanelController sharedController] showPanel];
+	[[StartupPanelController sharedController] showPanel];
 }
 
 - (void) applicationDidFinishLaunching:(NSNotification *)notification

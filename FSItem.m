@@ -147,13 +147,14 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 		[_childs makeObjectsPerformSelector: @selector(onParentDealloc)];
 		[_childs release];
 	}
-	
+
     [_fileURL release];
 	[_size release];
 	[_icons release];
-    
+	[_cachedPath release];
+
     //_parent and _delegate no release!
-	
+
     [super dealloc];
 }
 
@@ -178,10 +179,14 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 - (void) setFileURL: (NSURL*) url
 {
 	NSAssert( ![self isSpecialItem], @"free and other space items don't habe a NTFileDesc object");
-	
+
 	[url retain];
 	[_fileURL release];
 	_fileURL = url;
+
+	//invalidate cached path as it depends on URL
+	[_cachedPath release];
+	_cachedPath = nil;
 }
 
 /*- (unsigned) hash
@@ -616,13 +621,17 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 {
 	if ( ![self isSpecialItem] )
 	{
-		if ( [self isRoot] ) 
-			return [[self fileURL] cachedPath];
-		else
+		if ( _cachedPath == nil )
 		{
-			//parent path + "/" + name
-			return [[[self parent] path] stringByAppendingPathComponent: [self name]];
+			if ( [self isRoot] )
+				_cachedPath = [[[self fileURL] cachedPath] retain];
+			else
+			{
+				//parent path + "/" + name
+				_cachedPath = [[[[self parent] path] stringByAppendingPathComponent: [self name]] retain];
+			}
 		}
+		return _cachedPath;
 	}
 	else
 		return [self name];
@@ -892,10 +901,14 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 - (void) setParent: (FSItem*) parent
 {
 	_parent = parent; //weak reference (parents owns us)
-	
+
 	_delegate = nil; //we use our parent's delegate
-	
+
 	//_hash = 0; //our hash is now invalid as it depends on the path
+
+	//invalidate cached path as it depends on parent
+	[_cachedPath release];
+	_cachedPath = nil;
 }
 
 - (void) onParentDealloc

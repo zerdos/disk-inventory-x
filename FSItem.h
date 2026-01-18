@@ -36,6 +36,7 @@ typedef enum
     NSNumber *_size;
 	UInt64 _sizeValue;
     NSString *_kindName;
+    NSString *_cachedPath; //cached path string for performance
     //unsigned _hash;
     NSMutableArray<FSItem*> *_childs;
 	id _delegate;
