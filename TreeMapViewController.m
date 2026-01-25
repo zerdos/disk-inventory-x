@@ -181,12 +181,11 @@
 			color = [[[self document] fileTypeColors] colorForItem: fsItem];
 			break;
 		case FreeSpaceItem:
-			color = [NSColor colorWithCalibratedWhite: 1 alpha: 1];
-			//color = [NSColor colorWithCalibratedRed: 0 green: 0 blue: 0 alpha: 1];
+			color = [NSColor colorWithGenericGamma22White: 1 alpha: 1];
 			color = [TMVCushionRenderer normalizeColor: color];
 			break;
 		case OtherSpaceItem:
-			color = [NSColor colorWithCalibratedRed: 0.2 green: 0.2 blue: 0.2 alpha: 1];
+			color = [NSColor colorWithSRGBRed: 0.2 green: 0.2 blue: 0.2 alpha: 1];
 			color = [TMVCushionRenderer normalizeColor: color];
 			break;
 	}

@@ -88,7 +88,7 @@ BOOL g_EnableLogging;
 - (id)makeDocumentWithContentsOfFile:(NSString *)fileName ofType:(NSString *)docType
 {
 	//check whether "fileName" is a folder
-	NSDictionary *attribs = [[NSFileManager defaultManager] fileAttributesAtPath: fileName traverseLink: NO];
+	NSDictionary *attribs = [[NSFileManager defaultManager] attributesOfItemAtPath: fileName error: nil];
     if ( attribs != nil )
 	{
 		NSString *type = [attribs fileType];

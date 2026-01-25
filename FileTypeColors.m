@@ -35,7 +35,7 @@
 	
     _colors = [[NSMutableDictionary alloc] init];
 
-#define COLOR(r,g,b) [NSColor colorWithCalibratedRed: r green: g blue: b alpha: 1.0]
+#define COLOR(r,g,b) [NSColor colorWithSRGBRed: r green: g blue: b alpha: 1.0]
     
     _predefinedColors = [[NSMutableArray alloc] initWithObjects:
         COLOR(0, 0, 1),
@@ -101,7 +101,7 @@
             if ( rgbComponent > 0.9 )
                 rgbComponent = 0.9;
 
-            color = [NSColor colorWithCalibratedRed: rgbComponent green: rgbComponent blue: rgbComponent alpha: 1.0];
+            color = [NSColor colorWithSRGBRed: rgbComponent green: rgbComponent blue: rgbComponent alpha: 1.0];
 
             color = [TMVCushionRenderer normalizeColor: color];
 

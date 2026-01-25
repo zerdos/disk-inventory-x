@@ -33,7 +33,7 @@
 	self = [super init];
 		
 	//load Nib with info panel
-    if ( ![NSBundle loadNibNamed: @"InfoPanel" owner: self] )
+    if ( ![[NSBundle mainBundle] loadNibNamed: @"InfoPanel" owner: self topLevelObjects: nil] )
 	{
 		[self release];
 		self = nil;

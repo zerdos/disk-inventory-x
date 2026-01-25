@@ -23,7 +23,7 @@
     [super awakeFromNib];
 
     // Register for file URL drag types
-    [self registerForDraggedTypes:@[NSFilenamesPboardType, NSURLPboardType]];
+    [self registerForDraggedTypes:@[NSPasteboardTypeFileURL]];
 }
 
 - (void) dealloc
@@ -51,18 +51,18 @@
     if (_isDragHighlighted)
     {
         // Highlight color when dragging over
-        [[NSColor colorWithCalibratedRed:0.2 green:0.5 blue:0.9 alpha:0.2] setFill];
+        [[NSColor colorWithSRGBRed:0.2 green:0.5 blue:0.9 alpha:0.2] setFill];
         [roundedPath fill];
 
-        [[NSColor colorWithCalibratedRed:0.2 green:0.5 blue:0.9 alpha:0.8] setStroke];
+        [[NSColor colorWithSRGBRed:0.2 green:0.5 blue:0.9 alpha:0.8] setStroke];
     }
     else
     {
         // Normal state - light background
-        [[NSColor colorWithCalibratedWhite:0.95 alpha:1.0] setFill];
+        [[NSColor colorWithGenericGamma22White:0.95 alpha:1.0] setFill];
         [roundedPath fill];
 
-        [[NSColor colorWithCalibratedWhite:0.7 alpha:1.0] setStroke];
+        [[NSColor colorWithGenericGamma22White:0.7 alpha:1.0] setStroke];
     }
 
     // Draw dashed border
@@ -76,8 +76,8 @@
     NSDictionary *textAttrs = @{
         NSFontAttributeName: [NSFont systemFontOfSize:14.0 weight:NSFontWeightMedium],
         NSForegroundColorAttributeName: _isDragHighlighted ?
-            [NSColor colorWithCalibratedRed:0.2 green:0.5 blue:0.9 alpha:1.0] :
-            [NSColor colorWithCalibratedWhite:0.5 alpha:1.0]
+            [NSColor colorWithSRGBRed:0.2 green:0.5 blue:0.9 alpha:1.0] :
+            [NSColor colorWithGenericGamma22White:0.5 alpha:1.0]
     };
 
     NSSize textSize = [dropText sizeWithAttributes:textAttrs];
@@ -111,16 +111,17 @@
     NSPasteboard *pboard = [sender draggingPasteboard];
 
     // Check if we have file URLs
-    if ([[pboard types] containsObject:NSFilenamesPboardType])
-    {
-        NSArray *filenames = [pboard propertyListForType:NSFilenamesPboardType];
+    NSArray<NSURL *> *fileURLs = [pboard readObjectsForClasses:@[[NSURL class]]
+                                                       options:@{NSPasteboardURLReadingFileURLsOnlyKey: @YES}];
 
+    if ([fileURLs count] > 0)
+    {
         // Check if any of the files is a directory
         NSFileManager *fm = [NSFileManager defaultManager];
-        for (NSString *path in filenames)
+        for (NSURL *url in fileURLs)
         {
             BOOL isDir = NO;
-            if ([fm fileExistsAtPath:path isDirectory:&isDir] && isDir)
+            if ([fm fileExistsAtPath:[url path] isDirectory:&isDir] && isDir)
             {
                 _isDragHighlighted = YES;
                 [self setNeedsDisplay:YES];
@@ -152,18 +153,19 @@
 {
     NSPasteboard *pboard = [sender draggingPasteboard];
 
-    if ([[pboard types] containsObject:NSFilenamesPboardType])
+    NSArray<NSURL *> *fileURLs = [pboard readObjectsForClasses:@[[NSURL class]]
+                                                       options:@{NSPasteboardURLReadingFileURLsOnlyKey: @YES}];
+
+    if ([fileURLs count] > 0)
     {
-        NSArray *filenames = [pboard propertyListForType:NSFilenamesPboardType];
         NSMutableArray<NSURL *> *folderURLs = [NSMutableArray array];
 
         NSFileManager *fm = [NSFileManager defaultManager];
-        for (NSString *path in filenames)
+        for (NSURL *url in fileURLs)
         {
             BOOL isDir = NO;
-            if ([fm fileExistsAtPath:path isDirectory:&isDir] && isDir)
+            if ([fm fileExistsAtPath:[url path] isDirectory:&isDir] && isDir)
             {
-                NSURL *url = [NSURL fileURLWithPath:path];
                 [folderURLs addObject:url];
             }
         }

@@ -105,10 +105,7 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 	_type = OtherSpaceItem;
 	
 	_parent = parent; //weak reference
-	
-	//NSString* hashString = [[parent path] stringByAppendingString: @"/OtherSpace"];
-	//_hash = [hashString hash];
-	
+
 	[self recalculateSize: NO updateParent: NO];
 	
 	return self;
@@ -121,10 +118,7 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 	_type = FreeSpaceItem;
 	
 	_parent = parent;
-	
-	//NSString* hashString = [[parent path] stringByAppendingString: @"/FreeSpace"];
-	//_hash = [hashString hash];
-	
+
 	[self recalculateSize: NO updateParent: NO];
 	
 	return self;
@@ -189,14 +183,6 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 	_cachedPath = nil;
 }
 
-/*- (unsigned) hash
-{
-	if ( _hash == 0 )
-		_hash = [[self path] hash];
-	
-    return _hash;
-}
-*/
 - (BOOL) isEqual: (id) object
 {
 	//We don't check real equality here. This method is only intended to support NSSet.
@@ -501,75 +487,6 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 //the finder again and again.
 - (void) setKindStringIncludingChildren: (BOOL) includingChildren
 {
-/*
-    BOOL askLSCopyKindStringForTypeInfo = NO; //will be set to YES if file has type, creator or extension
-	
-	if ( [fileDesc isVolume] )
-		kindNameKey = @".Volume";
-	else if ( [self isAlias] )
-		kindNameKey = @".Alias";
-	else if (type != kLSUnknownType || creator != kLSUnknownCreator)
-	{
-		askLSCopyKindStringForTypeInfo = YES;
-		kindNameKey = [[NSMutableString alloc] init];
-		
-		if (type != kLSUnknownType)
-		{
-			NSString *typeString = [[NSString alloc] initWithBytes:&type length:sizeof(OSType) encoding:NSMacOSRomanStringEncoding];
-			[kindNameKey appendFormat:@"T:%@ ", typeString];
-			[typeString release];
-		}
-		if (creator != kLSUnknownCreator)
-		{
-			NSString *creatorString = [[NSString alloc] initWithBytes:&creator length:sizeof(OSType) encoding:NSMacOSRomanStringEncoding];
-			[kindNameKey appendFormat:@"C:%@ ", creatorString];
-			[creatorString release];
-		}
-		
-		if (extension)
-			[kindNameKey appendString: extension];
-	}
-	else if ( [fileDesc isDirectory] && ( extension == nil || ![fileDesc isPackage] ) ) //regular folder (no package)
-		kindNameKey = @".Folder";
-	else if ( extension != nil )
-	{
-		askLSCopyKindStringForTypeInfo = YES;
-		kindNameKey = [extension retain];
-	}
-	else if ( [fileDesc isExecutableBitSet] )
-		kindNameKey = @".UnixExecutable";
-	else
-		kindNameKey = @".unknown";
-	
-	if ( g_kindNameDictionary == nil )
-		g_kindNameDictionary = [[NSMutableDictionary alloc] init];
-	
-	NSString *kindName = [g_kindNameDictionary objectForKey: kindNameKey];
-	
-	if ( kindName != nil )
-		[[self fileDesc] setKindString: kindName];
-	else
-	{
-		if ( askLSCopyKindStringForTypeInfo )
-			LSCopyKindStringForTypeInfo( type, creator, (CFStringRef)extension, (CFStringRef*) &kindName);	// kindName is retained
-		
-		if ( kindName == nil )
-			kindName = [[fileDesc kindString] retain];
-		
-		if ( kindName != nil )
-		{
-			//remember kind name for similar files
-			[g_kindNameDictionary setObject: kindName forKey: kindNameKey];Re: DiskInventory X is not compatible with MacOS Catalina (10.15)
-			
-			[fileDesc setKindString: kindName];
-			[kindName release];
-		}
-		else
-			LOG( @"couldn't get kind name for '%@'; will use default kind", [self path]);
-	}
-	
-	[kindNameKey release];
- */
     NSString *uti = [[self fileURL] cachedUTI];
     
     if ( g_kindNameDictionary == nil )
@@ -728,8 +645,8 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 
 - (NSArray<NSPasteboardType>*) supportedPasteboardTypes
 {
-	NSMutableArray<NSPasteboardType> *types = [NSMutableArray arrayWithObjects: NSFilenamesPboardType,
-                                                                                NSStringPboardType,
+	NSMutableArray<NSPasteboardType> *types = [NSMutableArray arrayWithObjects: NSPasteboardTypeFileURL,
+                                                                                NSPasteboardTypeString,
                                                                                 NSFileContentsPboardType,
                                                                                 nil ];
 
@@ -737,16 +654,16 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 
 #define TESTTYPE( test, type ) if ( [uti isEqualToString:(NSString*)test] ) [types addObject: type]
 
-	TESTTYPE( kUTTypeRTF, NSRTFPboardType );
-	TESTTYPE( kUTTypeRTFD, NSRTFDPboardType );
-	TESTTYPE( kUTTypeHTML, NSHTMLPboardType );
-	TESTTYPE( kUTTypePDF, NSPDFPboardType );
+	TESTTYPE( kUTTypeRTF, NSPasteboardTypeRTF );
+	TESTTYPE( kUTTypeRTFD, NSPasteboardTypeRTFD );
+	TESTTYPE( kUTTypeHTML, NSPasteboardTypeHTML );
+	TESTTYPE( kUTTypePDF, NSPasteboardTypePDF );
 
 #undef TESTTYPE
-    
+
     // add TIFF is this is an image
     if ( UTTypeConformsTo((__bridge CFStringRef)uti, kUTTypeImage) )
-        [types addObject: NSTIFFPboardType];
+        [types addObject: NSPasteboardTypeTIFF];
 
 	return types;
 }
@@ -754,16 +671,16 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 - (BOOL) supportsPasteboardType: (NSString*) type
 {
 	NSString * uti = [[self fileURL] cachedUTI];
-	
+
 	//this if clause is derived from the code in NTFilePasteboardSource's "- (NSArray*)pasteboardTypes:(NSArray *)types"
-	return [type isEqualToString: NSFilenamesPboardType]
-			|| [type isEqualToString: NSStringPboardType]
+	return [type isEqualToString: NSPasteboardTypeFileURL]
+			|| [type isEqualToString: NSPasteboardTypeString]
 			|| [type isEqualToString: NSFileContentsPboardType]
-			|| ([type isEqualToString: NSTIFFPboardType] && UTTypeConformsTo((__bridge CFStringRef)uti, kUTTypeImage))
-			|| ([type isEqualToString: NSRTFPboardType] && [uti isEqualToString:(__bridge NSString*)kUTTypeRTF])
-			|| ([type isEqualToString: NSRTFDPboardType] && [uti isEqualToString:(__bridge NSString*)kUTTypeFlatRTFD])
-			|| ([type isEqualToString: NSHTMLPboardType] && [uti isEqualToString:(__bridge NSString*)NSHTMLPboardType])
-			|| ([type isEqualToString: NSPDFPboardType] && [uti isEqualToString:(__bridge NSString*)NSPDFPboardType]);
+			|| ([type isEqualToString: NSPasteboardTypeTIFF] && UTTypeConformsTo((__bridge CFStringRef)uti, kUTTypeImage))
+			|| ([type isEqualToString: NSPasteboardTypeRTF] && [uti isEqualToString:(__bridge NSString*)kUTTypeRTF])
+			|| ([type isEqualToString: NSPasteboardTypeRTFD] && [uti isEqualToString:(__bridge NSString*)kUTTypeFlatRTFD])
+			|| ([type isEqualToString: NSPasteboardTypeHTML] && [uti isEqualToString:(__bridge NSString*)kUTTypeHTML])
+			|| ([type isEqualToString: NSPasteboardTypePDF] && [uti isEqualToString:(__bridge NSString*)kUTTypePDF]);
 }
 
 - (void) writeToPasteboard: (NSPasteboard*) pboard
@@ -786,31 +703,29 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 - (void)pasteboard:(NSPasteboard *)pboard provideDataForType:(NSString *)type
 {
 	LOG( @"entering FSItem.pasteboard:provideDataForType: %@", type )
-	
+
     NSURL *url = [self fileURL];
     NSString *path = [url cachedPath];
     NSString * uti = [url cachedUTI];
 
-	if ([type isEqualToString:NSFilenamesPboardType])
+	if ([type isEqualToString:NSPasteboardTypeFileURL])
 	{
-		NSArray* pathsArray = [NSArray arrayWithObject: path];
-		
-		[pboard setPropertyList:pathsArray forType:NSFilenamesPboardType];
+		[pboard writeObjects:@[url]];
 	}
-	else if ([type isEqualToString:NSStringPboardType])
+	else if ([type isEqualToString:NSPasteboardTypeString])
 	{
 		// set the path
-		[pboard setString:path forType:NSStringPboardType];
+		[pboard setString:path forType:NSPasteboardTypeString];
 	}
 	else if ([type isEqualToString:NSFileContentsPboardType])
 	{
 		// write the contents
 		[pboard writeFileContents:path];
 	}
-    else if ([type isEqualToString:NSTIFFPboardType])
+    else if ([type isEqualToString:NSPasteboardTypeTIFF])
     {
         if ([uti isEqualToString: (__bridge NSString *)kUTTypeTIFF])
-            [pboard setData:[NSData dataWithContentsOfFile:[url path]] forType:NSTIFFPboardType];
+            [pboard setData:[NSData dataWithContentsOfFile:[url path]] forType:NSPasteboardTypeTIFF];
         else if ( UTTypeConformsTo((__bridge CFStringRef)uti, kUTTypeImage) )
         {
             // open the image and return TIFFRepresentation
@@ -821,34 +736,34 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
                 NSData* data = [image TIFFRepresentation];
 
                 if (data)
-                    [pboard setData:data forType:NSTIFFPboardType];
+                    [pboard setData:data forType:NSPasteboardTypeTIFF];
             }
         }
     }
-	else if ([type isEqualToString:NSRTFPboardType])
+	else if ([type isEqualToString:NSPasteboardTypeRTF])
 	{
 		if ([uti isEqualToString:(__bridge NSString*)kUTTypeRTF])
-			[pboard setData:[NSData dataWithContentsOfFile:path] forType:NSRTFPboardType];
+			[pboard setData:[NSData dataWithContentsOfFile:path] forType:NSPasteboardTypeRTF];
 	}
-	else if ([type isEqualToString:NSRTFDPboardType])
+	else if ([type isEqualToString:NSPasteboardTypeRTFD])
 	{
 		if ([uti isEqualToString:(__bridge NSString*)kUTTypeFlatRTFD])
 		{
 			NSFileWrapper *tempRTFDData = [[[NSFileWrapper alloc] initWithPath:path] autorelease];
-			[pboard setData:[tempRTFDData serializedRepresentation] forType:NSRTFDPboardType];
+			[pboard setData:[tempRTFDData serializedRepresentation] forType:NSPasteboardTypeRTFD];
 		}
 	}
-	else if ([type isEqualToString:NSHTMLPboardType])
+	else if ([type isEqualToString:NSPasteboardTypeHTML])
 	{
 		if ([uti isEqualToString:(__bridge NSString*)kUTTypeHTML])
-			[pboard setData:[NSData dataWithContentsOfFile:path] forType:NSHTMLPboardType];
+			[pboard setData:[NSData dataWithContentsOfFile:path] forType:NSPasteboardTypeHTML];
 	}
-	else if ([type isEqualToString:NSPDFPboardType])
+	else if ([type isEqualToString:NSPasteboardTypePDF])
 	{
 		if ([uti isEqualToString:(__bridge NSString*)kUTTypePDF])
-			[pboard setData:[NSData dataWithContentsOfFile:path] forType:NSPDFPboardType];
+			[pboard setData:[NSData dataWithContentsOfFile:path] forType:NSPasteboardTypePDF];
 	}
-	
+
 	LOG( @"    exiting FSItem.pasteboard:provideDataForType: %@", type )
 }
 

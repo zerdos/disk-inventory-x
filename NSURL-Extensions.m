@@ -26,10 +26,13 @@ void LoadFirmlinks()
     
     g_Firmlinks = [[NSMutableDictionary<NSURL*, NSURL*> alloc] init];
     
-    // read everything from file
+    // read everything from file (may not exist on pre-Catalina systems)
+    NSError *error = nil;
     NSString* fileContents = [NSString stringWithContentsOfFile: firmlinkListFile
                                                        encoding: NSASCIIStringEncoding
-                                                          error: nil];
+                                                          error: &error];
+    if ( fileContents == nil )
+        return;
 
     // separate by new line
     NSArray<NSString*>* allLines =
@@ -127,8 +130,8 @@ void LoadFirmlinks()
     
     // fallback to NSURLFileSizeKey
     if ( fileSizeBytes == nil )
-        [self getNumberValue: NSURLFileSizeKey];
- 
+        fileSizeBytes = [self getNumberValue: NSURLFileSizeKey];
+
     return fileSizeBytes;
 }
 
@@ -139,8 +142,8 @@ void LoadFirmlinks()
     
     // fallback to NSURLTotalFileSizeKey
     if ( fileSizeBytes == nil )
-        [self getNumberValue: NSURLTotalFileSizeKey];
-    
+        fileSizeBytes = [self getNumberValue: NSURLTotalFileSizeKey];
+
     return fileSizeBytes;
 }
 
@@ -307,8 +310,8 @@ void LoadFirmlinks()
     
     // fallback to NSURLFileSizeKey
     if ( fileSizeBytes == nil )
-        [self getCachedNumberValue: NSURLFileSizeKey];
-    
+        fileSizeBytes = [self getCachedNumberValue: NSURLFileSizeKey];
+
     return fileSizeBytes;
 }
 
@@ -319,8 +322,8 @@ void LoadFirmlinks()
     
     // fallback to NSURLTotalFileSizeKey
     if ( fileSizeBytes == nil )
-        [self getCachedNumberValue: NSURLTotalFileSizeKey];
-    
+        fileSizeBytes = [self getCachedNumberValue: NSURLTotalFileSizeKey];
+
     return fileSizeBytes;
 }
 

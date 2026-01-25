@@ -74,7 +74,7 @@
     [self rebuildVolumesArray];
 
     // Load Nib with startup panel
-    if (![NSBundle loadNibNamed:@"StartupPanel" owner:self])
+    if (![[NSBundle mainBundle] loadNibNamed:@"StartupPanel" owner:self topLevelObjects:nil])
     {
         [self release];
         return nil;

@@ -78,7 +78,7 @@
 	[self rebuildVolumesArray];
 	
 	//load Nib with volume panel
-    if ( ![NSBundle loadNibNamed: @"VolumesPanel" owner: self] )
+    if ( ![[NSBundle mainBundle] loadNibNamed: @"VolumesPanel" owner: self topLevelObjects: nil] )
 	{
 		[self release];
 		self = nil;
@@ -177,32 +177,36 @@
                                                                                                      options: NSVolumeEnumerationSkipHiddenVolumes];
     
     [self willChangeValueForKey: @"volumes"];
-    
-    NS_DURING
-    [_volumes release];
-    _volumes = [[NSMutableArray alloc] initWithCapacity: [vols count]];
-    
-    for ( NSURL *volumeURL in vols )
+
+    @try
     {
-        [volumeURL cacheResourcesInArray: volProps];
-        
-        //put NSURL object for key "volume" in the entry dictionary
-        NSMutableDictionary *entry = [NSMutableDictionary dictionaryWithObject: volumeURL forKey: @"volume"];
-        
-        //put volume icon for key "image" in the entry dictionary
-        NSImage *volImage = [volumeURL icon];
-        [volImage setSize: NSMakeSize(32,32)];
-        
-        [entry setObject: ( volImage == nil ? (id)[NSNull null] : volImage )
-                  forKey: @"image"];
-        
-        [_volumes addObject: entry];
-        
-        if ( [[volumeURL volumeTotalCapacity] unsignedLongLongValue] > _maxVolumeSize)
-            _maxVolumeSize = [[volumeURL volumeTotalCapacity] unsignedLongLongValue];
+        [_volumes release];
+        _volumes = [[NSMutableArray alloc] initWithCapacity: [vols count]];
+
+        for ( NSURL *volumeURL in vols )
+        {
+            [volumeURL cacheResourcesInArray: volProps];
+
+            //put NSURL object for key "volume" in the entry dictionary
+            NSMutableDictionary *entry = [NSMutableDictionary dictionaryWithObject: volumeURL forKey: @"volume"];
+
+            //put volume icon for key "image" in the entry dictionary
+            NSImage *volImage = [volumeURL icon];
+            [volImage setSize: NSMakeSize(32,32)];
+
+            [entry setObject: ( volImage == nil ? (id)[NSNull null] : volImage )
+                      forKey: @"image"];
+
+            [_volumes addObject: entry];
+
+            if ( [[volumeURL volumeTotalCapacity] unsignedLongLongValue] > _maxVolumeSize)
+                _maxVolumeSize = [[volumeURL volumeTotalCapacity] unsignedLongLongValue];
+        }
     }
-    NS_HANDLER
-    NS_ENDHANDLER
+    @catch (NSException *exception)
+    {
+        // Ignore exceptions during volume enumeration
+    }
     
     [self rebuildProgressIndicatorArray];
     

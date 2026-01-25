@@ -22,11 +22,11 @@
 - (id) init
 {
 	self = [super init];
-	
+
     //load Nib with progress panel
-	if ( ![NSBundle loadNibNamed: @"LoadingPanel" owner: self] )
+	if ( ![[NSBundle mainBundle] loadNibNamed: @"LoadingPanel" owner: self topLevelObjects: nil] )
 		NSAssert( NO, @"couldn't load LoadingPanel.nib" );
-	
+
 	[_loadingProgressIndicator setUsesThreadedAnimation: NO];
     [_loadingProgressIndicator startAnimation: self];
 	
@@ -46,9 +46,9 @@
 	self = [super init];
 	
     //load Nib with progress panel
-	if ( ![NSBundle loadNibNamed: @"LoadingPanel" owner: self] )
+	if ( ![[NSBundle mainBundle] loadNibNamed: @"LoadingPanel" owner: self topLevelObjects: nil] )
 		NSAssert( NO, @"couldn't load LoadingPanel.nib" );
-	
+
 	[NSApp beginSheet: _loadingPanel
 	   modalForWindow: window
 		modalDelegate: self
