@@ -69,10 +69,14 @@
 	//create "free space" and "other space" items
 	//(don't use [self rootItem] as we want the root, not the zoomed item)
 	FSItem *rootItem =  [[self document] rootItem];
-	
-	_otherSpaceItem = [[FSItem alloc] initAsOtherSpaceItemForParent: rootItem];
-	_freeSpaceItem = [[FSItem alloc] initAsFreeSpaceItemForParent: rootItem];
-	
+
+	// Only create special items if rootItem is available
+	// They will be created later in itemsChanged: when scan completes
+	if (rootItem != nil) {
+		_otherSpaceItem = [[FSItem alloc] initAsOtherSpaceItemForParent: rootItem];
+		_freeSpaceItem = [[FSItem alloc] initAsFreeSpaceItemForParent: rootItem];
+	}
+
 	[self reloadData];
 }
 

@@ -96,9 +96,14 @@ static const uint64_t kProgressUpdateInterval = 33 * NSEC_PER_MSEC;
     _progressSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, dispatch_get_main_queue());
 
     dispatch_source_set_event_handler(_progressSource, ^{
-        if ([_delegate respondsToSelector:@selector(scanner:didEnterFolder:)] && _currentPath)
+        NSString *path = nil;
+        @synchronized(self)
         {
-            [_delegate scanner:self didEnterFolder:_currentPath];
+            path = [[_currentPath retain] autorelease];
+        }
+        if ([_delegate respondsToSelector:@selector(scanner:didEnterFolder:)] && path)
+        {
+            [_delegate scanner:self didEnterFolder:path];
         }
     });
 

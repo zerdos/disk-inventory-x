@@ -166,8 +166,13 @@ NSString* FSItemLoadingFailedException = @"FSItemLoadingFailedException";
 {
 	if ( ![self isSpecialItem] )
 		return _fileURL;
-	else
-		return [[self root] fileURL];
+
+	FSItem *rootItem = [self root];
+	// Guard against infinite recursion: if root is self (broken parent chain), return nil
+	if (rootItem == self)
+		return nil;
+
+	return [rootItem fileURL];
 }
 
 - (void) setFileURL: (NSURL*) url

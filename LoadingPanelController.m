@@ -41,10 +41,40 @@
 	return self;
 }
 
+- (id) initNonModal
+{
+	self = [super init];
+
+    //load Nib with progress panel
+	if ( ![[NSBundle mainBundle] loadNibNamed: @"LoadingPanel" owner: self topLevelObjects: nil] )
+		NSAssert( NO, @"couldn't load LoadingPanel.nib" );
+
+	// Retain the panel - in MRR, top-level NIB objects are autoreleased
+	// and IBOutlet connections don't auto-retain
+	[_loadingPanel retain];
+
+	// Use threaded animation so it works without pumping the run loop
+	[_loadingProgressIndicator setUsesThreadedAnimation: YES];
+    [_loadingProgressIndicator startAnimation: self];
+
+	// Show the panel as a regular window (not modal)
+	[_loadingPanel setLevel: NSFloatingWindowLevel];
+	[_loadingPanel center];
+	[_loadingPanel makeKeyAndOrderFront: self];
+
+	// No modal session - this allows the main run loop to process normally
+	_loadingPanelModalSession = 0;
+
+	_lastEventLoopRun = 0;
+	_cancelPressed = NO;
+
+	return self;
+}
+
 - (id) initAsSheetForWindow: (NSWindow*) window
 {
 	self = [super init];
-	
+
     //load Nib with progress panel
 	if ( ![[NSBundle mainBundle] loadNibNamed: @"LoadingPanel" owner: self topLevelObjects: nil] )
 		NSAssert( NO, @"couldn't load LoadingPanel.nib" );
@@ -54,19 +84,19 @@
 		modalDelegate: self
 	   didEndSelector: nil
 		  contextInfo: NULL];
-	
+
 	[_loadingPanel setWorksWhenModal: YES];
-	
+
 	[_loadingProgressIndicator setUsesThreadedAnimation: NO];
     [_loadingProgressIndicator startAnimation: self];
-	
+
 	//we don't have modal session if we show the panel as a sheet
 	_loadingPanelModalSession = 0;
-	
+
 	_lastEventLoopRun = 0;
-	
+
 	_cancelPressed = NO;
-	
+
 	return self;
 }
 
@@ -80,6 +110,10 @@
 
 - (void) close
 {
+	// Already closed
+	if ( _loadingPanel == nil )
+		return;
+
 	if ( [_loadingPanel isSheet] )
 	{
 		[NSApp endSheet: _loadingPanel];
@@ -92,10 +126,13 @@
 	}
 	else
 	{
-		OBPRECONDITION( _loadingPanelModalSession != 0 );
-		[[NSApplication sharedApplication] endModalSession: _loadingPanelModalSession];
-		_loadingPanelModalSession = 0;
-		
+		// Only end modal session if we started one (initNonModal sets it to 0)
+		if ( _loadingPanelModalSession != 0 )
+		{
+			[[NSApplication sharedApplication] endModalSession: _loadingPanelModalSession];
+			_loadingPanelModalSession = 0;
+		}
+
 		[self closeNoModalEnd];
 	}
 }
@@ -141,6 +178,12 @@
 	[msg retain];
 	[_message release];
 	_message = msg;
+
+	// For non-modal usage, update immediately
+	if (_loadingPanelModalSession == 0 && _message != nil)
+	{
+		[_loadingTextField setStringValue: _message];
+	}
 }
 
 - (void) runEventLoop

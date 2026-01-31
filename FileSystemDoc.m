@@ -242,90 +242,41 @@ NSString *OldItem = @"OldItem";
 
 - (BOOL) readFromFile: (NSString *) folder ofType: (NSString *) docType
 {
-    //now the real work: loading the folder contents
-    @try
+    // Check if the folder exists before starting
+    NSURL *folderURL = [NSURL fileURLWithPath:folder];
+    if (![folderURL stillExists])
     {
-        g_fileCount = g_folderCount = 0;
-        
-		_progressController = [[LoadingPanelController alloc] init];
-		[_progressController startAnimation];	
-		
-		uint64_t startTime = getTime();
-		
-        _rootItem = [[FSItem alloc] initWithPath: folder];
-		if ( ![[_rootItem fileURL] stillExists] )
-		{
-			[_rootItem release];
-			_rootItem = nil;
-			[_progressController release];
-			_progressController = nil;
-			LOG( @"readFromFile: path '%@' doesn't exits", folder );
-			return NO;
-		}
-		
-		[_rootItem setDelegate: self];
-		
-        [_rootItem loadChildren];
-        
- 		uint64_t doneLoadingTime = getTime();
-		LOG (@"loading time:  %.2f seconds", subtractTime(doneLoadingTime, startTime));
-		
-        LOG(@"************** Loading complete *******************" );
-        LOG(@"%u items created", g_fileCount + g_folderCount );
-        LOG(@"%u files", g_fileCount );
-        LOG(@"%u folders", g_folderCount );
-        
-		//ok, now we've got an FSItem for every file and directory in the given folder
-		//[_progressController setMessageText: NSLocalizedString( @"Classifying Files", @"")];
-				
-		//collect sizes and file count of all file kinds 
-		[self refreshFileKindStatistics];
-		
-		uint64_t doneFileKindStatsTime = getTime();
-		LOG (@"file kind statistics time:  %.2f seconds", subtractTime(doneFileKindStatsTime, doneLoadingTime));
-		
-		//the modal session must be ended in the same NS_DURING section (if no exception occured)
-		[_progressController release];
-		_progressController = nil;
-    }
-    @catch(NSException *localException)
-    {
-        LOG( @"exception '%@' occured during directory traversal: %@", [localException name], [localException reason] );
-		
-		// according to the docu, we should not end a modal session explicitly in the case of an exception
-        // but this seems to be no longer true at least on Mac OS 10.13 (even not when using NS_DURING, NS_HANDLER, ..)
-		//[_progressController closeNoModalEnd];
-		[_progressController release];
-		_progressController = nil;
-		
-		[_rootItem release];
-		_rootItem = nil;
-
-		if ( [[localException name] isEqualToString: FSItemLoadingCanceledException]
-			 || [[localException name] isEqualToString: CollectFileKindStatisticsCanceledException] )
-		{
-			//loading canceled by user
-		}
-		else
-		{
-			//error
-			NSRunInformationalAlertPanel( NSLocalizedString( @"The folder's content could not be loaded.", @""), @"%@", nil, nil, nil, [localException reason]);
-		}
-		
+        LOG(@"readFromFile: path '%@' doesn't exist", folder);
         return NO;
     }
-    @finally
-    {
-        [_directoryStack release];
-        _directoryStack = nil;
-    }
-        
-   return YES;
+
+    // Reset counters
+    g_fileCount = g_folderCount = 0;
+
+    // Show progress panel (non-modal for async scanning)
+    _progressController = [[LoadingPanelController alloc] initNonModal];
+    [_progressController setMessageText:NSLocalizedString(@"Scanning folder...", @"")];
+
+    // Create and start the async scanner
+    _scanner = [[FSItemScanner alloc] initWithURL:folderURL];
+    [_scanner setDelegate:self];
+    [_scanner startScanning];
+
+    LOG(@"Started async scanning of '%@'", folder);
+
+    // Return YES to indicate document is loading
+    // Windows will be created when scanning completes via delegate callback
+    return YES;
 }
 
 - (IBAction) cancelScanningFolder:(id)sender
 {
-	[[NSApplication sharedApplication] stopModal];
+    // Cancel the async scanner if running
+    if (_scanner != nil)
+    {
+        [_scanner cancel];
+    }
+    [[NSApplication sharedApplication] stopModal];
 }
 
 - (BOOL) showPhysicalFileSize;
@@ -964,7 +915,8 @@ NSString *OldItem = @"OldItem";
 	// Set ourselves as delegate for any future operations
 	[_rootItem setDelegate:self];
 
-	// Close progress panel
+	// Close and release progress panel
+	[_progressController close];
 	[_progressController release];
 	_progressController = nil;
 
@@ -989,7 +941,8 @@ NSString *OldItem = @"OldItem";
 {
 	LOG(@"Scanner failed with error: %@", [error localizedDescription]);
 
-	// Close progress panel
+	// Close and release progress panel
+	[_progressController close];
 	[_progressController release];
 	_progressController = nil;
 
@@ -1016,7 +969,8 @@ NSString *OldItem = @"OldItem";
 {
 	LOG(@"Scanner was cancelled");
 
-	// Close progress panel
+	// Close and release progress panel
+	[_progressController close];
 	[_progressController release];
 	_progressController = nil;
 

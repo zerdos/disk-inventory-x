@@ -29,6 +29,7 @@
 }
 
 - (id) init; //will start modal session immediately
+- (id) initNonModal; //shows panel without modal session (for async scanning)
 - (id) initAsSheetForWindow: (NSWindow*) window; //will start modal session immediately
 
 - (void) close;

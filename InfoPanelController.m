@@ -31,7 +31,7 @@
 - (id) init
 {
 	self = [super init];
-		
+
 	//load Nib with info panel
     if ( ![[NSBundle mainBundle] loadNibNamed: @"InfoPanel" owner: self topLevelObjects: nil] )
 	{
@@ -40,25 +40,22 @@
 	}
 	else
 	{
-		/*
-		NSRect frameRect = [_infoView frame];
-		
-		[_infoView removeFromSuperviewWithoutNeedingDisplay];
-		
-		_infoView = [[DIXFileInfoView alloc] initWithFrame: frameRect longFormat: YES];
-		[_infoView autorelease];
-		
-		[_infoView setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
-		
-		[[_infoPanel contentView] addSubview: _infoView];
-		 */
+		// Retain the panel (top-level NIB objects are autoreleased in MRR)
+		[_infoPanel retain];
+
+		// Ensure panel is not visible until explicitly shown
+		[_infoPanel orderOut:nil];
+
+		// Disable window state restoration for this panel
+		[_infoPanel setRestorable:NO];
 	}
-	
+
 	return self;
 }
 
 - (void) dealloc
-{	
+{
+	[_infoPanel release];
     [super dealloc];
 }
 
